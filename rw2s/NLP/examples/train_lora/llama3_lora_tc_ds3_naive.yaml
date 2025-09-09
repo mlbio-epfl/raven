@@ -1,0 +1,46 @@
+### model
+model_name_or_path: meta-llama/Llama-3.1-8B #meta-llama/Llama-3.1-8B
+trust_remote_code: true
+
+### method
+stage: tc
+do_train: true
+finetuning_type: lora
+lora_target: all
+#deepspeed: examples/deepspeed/ds_z3_config.json  # choices: [ds_z0_config.json, ds_z2_config.json, ds_z3_config.json]
+dataset_from_disk: /data/datasets/amazon_wilds_llama
+train_mode: weak
+loss: logconf # "adapt_logconf", xent
+
+### dataset
+dataset: amazon_wilds
+template: llama3
+cutoff_len: 2048
+max_samples: 10000000
+overwrite_cache: true
+preprocessing_num_workers: 16
+num_labels: 5
+
+### output
+output_dir: /data/rw2s_exp/STRONG/llama_logconf_1e5_s100
+logging_steps: 10
+save_steps: 2000
+plot_loss: true
+overwrite_output_dir: true
+
+### train
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 1
+learning_rate: 1.0e-5
+num_train_epochs: 2.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+ddp_timeout: 180000000
+seed: 100
+
+### eval
+val_size: 0.1
+per_device_eval_batch_size: 2
+eval_strategy: steps
+eval_steps: 1000

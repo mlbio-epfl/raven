@@ -1,0 +1,26 @@
+name: rw2s-test
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python>=3.7
+  - numpy=1.24
+  - dill=0.3.8
+  - matplotlib
+  - ruamel_yaml
+  - wilds
+  - pip
+  - pip:
+    - --extra-index-url https://download.pytorch.org/whl/cu112
+    - torch==2.1.0
+    - torchvision==0.16.0
+    - datasets~=2.14
+    - fire~=0.4
+    - torch_optimizer~=0.3
+    - wandb~=0.16.1
+    - tqdm~=4.66
+    - loguru~=0.7.2
+    - lovely-tensors~=0.1.17
+    - pandas==1.5.3
+    - setuptools==80.9.0
+    - ruamel.yaml==0.18.15

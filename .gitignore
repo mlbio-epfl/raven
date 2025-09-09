@@ -1,0 +1,5 @@
+.vscode
+*.egg-info
+wandb
+*__pycache__*
+*__archive__*

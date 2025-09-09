@@ -1,0 +1,19 @@
+seed: 0
+device: 0
+
+ensemble:
+  ### ensemble weights optimization
+  ensemble_weights_opter_cfg: # lr=0 => ensemble weights stay at their initial values
+    lr: 0 ###### LR
+  ensemble_weights_init: "uniform" # "uniform", "random", "entropy", "kl_disagreement"
+  ensemble_weights_per_sample: false
+  reset_ensemble_weights_at_epoch_end_to_uniform: false
+  ensemble_weights_freeze_first_frac_of_epochs: 0.5
+  save_ensemble_weights: "all" # "none", "all", "last"
+  easy_hard_schedule: 0.5 #0.1, 0.2, 0.5
+  weak_merged_labels:
+  ### ensemble models
+  weak_models:
+    - load_labels: "/data/w2s_features/Llama-3.1-8B/0_ens_id_ver2"   ## ID
+    - load_labels: "/data/w2s_features/Llama-3.1-8B/1_ens_id_ver2"
+    - load_labels: "/data/w2s_features/Llama-3.1-8B/2_ens_id_ver2"

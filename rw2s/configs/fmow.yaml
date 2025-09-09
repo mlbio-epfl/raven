@@ -1,0 +1,89 @@
+seed: 0
+device: 0
+track_in_wandb: false
+save_path: "/mlbio_scratch/sobotka/w2s"
+
+data:
+  path: "/mlbio_scratch/sobotka/data"
+  name: "fmow"
+  batch_size: 64 # weak model training
+  n_threads: 4
+  subsplit_train: null # weak model training: portion of the train set to train/eval on
+  data_key: "id_val"
+
+ensemble:
+  ### ensemble weights optimization
+  ensemble_weights_opter_cfg:
+    lr: 0 # lr=0 => adaptive weights turned off
+  ensemble_weights_init: "uniform" # "uniform", "random", "entropy"
+  ensemble_weights_per_sample: false # if true, each sample has its own set of ensemble weights
+  reset_ensemble_weights_at_epoch_end_to_uniform: false
+  ensemble_weights_freeze_first_frac_of_epochs: null # easy-sample guided initialization: set to the fraction of epochs where you want to train only on easy samples 
+  save_ensemble_weights: "all" # "none", "all", "last" (for analysis)
+
+  ### ensemble models
+  weak_models:
+    - model_name: "alexnet"
+      pretrained: false
+      # load_ckpt: null
+      load_ckpt: "/mlbio_scratch/sobotka/w2s/fmow/models/2024-09-22_10-57-52__weak__alexnet__fmow.pt"
+      freeze_backbone: false
+      train: false
+      train_cfg: # ignored if train=false
+        domain_start_end_idxs: null # train/val only on a subset of domains
+        domain_group: null # train/val only on a subset of the domains of 'domain_name'
+        loss_fn_name: "xent"
+        loss_fn_kwargs: null
+        n_epochs: 150
+        early_stopping_patience: 10
+        optimizer_name: "Adam"
+        optimizer_kwargs:
+          lr: 8e-4
+          weight_decay: 5e-3
+        scheduler_name: "cosine" # "cosine", "multiplicative"
+        scheduler_mul_factor: null # only for "multiplicative" scheduler_name
+    - model_name: "alexnet"
+      pretrained: false
+      load_ckpt: "/mlbio_scratch/sobotka/w2s/fmow/models/2024-09-29_23-01-03__weak__alexnet__fmow.pt"
+      freeze_backbone: false
+      train: false
+    - model_name: "alexnet"
+      pretrained: false
+      load_ckpt: "/mlbio_scratch/sobotka/w2s/fmow/models/2024-09-29_22-22-29__weak__alexnet__fmow.pt"
+      freeze_backbone: false
+      train: false
+
+w2s: # weak-to-strong (w2s) training procedure
+  student_models: # add multiple models for bootstrapping
+    # - model_name: "resnet50_dino"
+    #   pretrained: true
+    #   load_probe_ckpt: null
+    - model_name: "vitb8_dino"
+      pretrained: true
+      load_probe_ckpt: null
+  add_students_to_ensemble: false
+
+  train_val_test_split: [0.7, 0.1, 0.2] # portion of the OOD test set to train on/validate on/evaluate on
+  teacher_labels_loss_fn_name: "xent" # "xent", "logconf" (Conf method), "adapt_logconf" (V-sup method), "edl" (Bayes)
+  teacher_labels_loss_fn_kwargs: null
+  gt_labels_loss_fn_name: "xent"
+  gt_labels_loss_fn_kwargs: null
+
+  n_epochs: 100
+  lr: 1e-4
+  batch_size: 128
+
+  ### easy-sample guided initialization: set to the number of epochs where you want to train only on easy samples
+  ignore_samples_with_disagreement_first_n_epochs: null
+
+  ### what w2s setups to train/eval
+  eval_on_id_val_data: false # for ID experiments
+  id_val_data_key: "id_val" # for ID experiments
+  eval_on_test_data: true # for OOD experiments
+  test_data_key: "test" # for OOD experiments
+
+  ### saving/loading
+  save_labels: true
+  save_embeddings: true
+  load_labels: false
+  load_embeddings: false

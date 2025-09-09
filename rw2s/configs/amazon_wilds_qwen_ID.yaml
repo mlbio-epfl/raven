@@ -1,0 +1,19 @@
+seed: 0
+device: 0
+
+ensemble:
+  ### ensemble weights optimization
+  ensemble_weights_opter_cfg: # lr=0 => ensemble weights stay at their initial values
+    lr: 0
+  ensemble_weights_init: "uniform" # "uniform", "random", "entropy", "kl_disagreement"
+  ensemble_weights_per_sample: false
+  reset_ensemble_weights_at_epoch_end_to_uniform: false
+  ensemble_weights_freeze_first_frac_of_epochs: 0.2
+  save_ensemble_weights: "all" # "none", "all", "last"
+  easy_hard_schedule: 0.2 #0.1, 0.2, 0.5
+
+  ### ensemble models
+  weak_models:
+    - load_labels: "/data/w2s_features/Qwen2.5-7B/0_ens_id_ver1"
+    - load_labels: "/data/w2s_features/Qwen2.5-7B/1_ens_id_ver1"
+    - load_labels: "/data/w2s_features/Qwen2.5-7B/2_ens_id_ver1"  

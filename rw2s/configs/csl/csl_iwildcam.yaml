@@ -1,0 +1,36 @@
+seed: 0
+device: 0
+save_path: "/mlbio_scratch/sobotka/w2s"
+
+data:
+  path: "/mlbio_scratch/sobotka/data"
+  name: "iwildcam"
+  batch_size: 64
+  n_threads: 4
+  subsplit_train: null # keep null
+
+csl:
+  soft_teacher: true
+  denoise_criterion: "top3" # authors used top3
+  teacher_assignment: "student_teacher_agreement" # ensemble, student_teacher_agreement (used in the paper), oracle
+  reinit_student_head_at_each_layer: true # authors reinitialize the student head at each layer
+  setups:
+    - split:
+        teacher_label_paths:
+          - "/mlbio_scratch/sobotka/w2s/iwildcam/cache/domains/labels__alexnet__0_243.pt"
+          - null # signal that a new layer of teachers starts
+          - "/mlbio_scratch/sobotka/w2s/iwildcam/cache/domains/labels__alexnet__0_121.pt"
+          - "/mlbio_scratch/sobotka/w2s/iwildcam/cache/domains/labels__alexnet__121_243.pt"
+          - null # signal that a new layer of teachers starts
+          - "/mlbio_scratch/sobotka/w2s/iwildcam/cache/domains/labels__alexnet__0_60.pt"
+          - "/mlbio_scratch/sobotka/w2s/iwildcam/cache/domains/labels__alexnet__60_121.pt"
+          - "/mlbio_scratch/sobotka/w2s/iwildcam/cache/domains/labels__alexnet__121_182.pt"
+          - "/mlbio_scratch/sobotka/w2s/iwildcam/cache/domains/labels__alexnet__182_243.pt"
+        student_emb_path: "/mlbio_scratch/sobotka/w2s/iwildcam/cache/embs__vitb8_dino__iwildcam.pt"
+        frac_max: null
+
+w2s:
+  train_val_test_split: [0.7, 0.1, 0.2] # portion of the pseudo-labeled data to train on, validate on, and evaluate on, respectively
+  n_epochs: 50
+  lr: 1e-3
+  batch_size: 128

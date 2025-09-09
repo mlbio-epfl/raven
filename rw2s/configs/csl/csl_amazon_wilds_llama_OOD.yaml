@@ -1,0 +1,31 @@
+seed: 1
+device: 0
+save_path: "/data/w2s_tune/amazon_wilds_llama_CSL_OOD_1e5_10"
+
+data:
+  path: "/data/H100_back/datasets/amazon_wilds"
+  name: "amazon_wilds"
+  batch_size: 32 # for training the weak model
+  n_threads: 4
+  subsplit_train: null # portion of the train set to train/eval on (weak model training)
+
+csl:
+  soft_teacher: true
+  denoise_criterion: "top2" # authors used top3 but top2 needed due to not enough domains
+  teacher_assignment: "ensemble" # ensemble, student_teacher_agreement, oracle
+  reinit_student_head_at_each_layer: true # authors reinitialize the student head at each layer
+  setups:
+    - split:
+        teacher_label_paths:
+          - "/data/w2s/old/LLAMA_OOD_0112_RAWS_E20/bs=32-dn=amaz_wild-e=20-ee=5000-lp=1-l=xent-l=0.0001-ls=cosi_anne-mc=1024-ms=Llama-3.2-1B-nd=20000-ntd=10000-o=adam-s=2-twd=0/weak_labels"
+          - null # signal that a new layer of teachers starts
+          - "/data/w2s/old/LLAMA_OOD_0112_DOM1_E20/bs=32-dn=amaz_wild-e=20-ee=5000-lp=1-l=xent-l=1e-05-ls=cosi_anne-mc=1024-ms=Llama-3.2-1B-nd=20000-ntd=10000-o=adam-s=0-twd=0/weak_labels"
+          - "/data/w2s/old/LLAMA_OOD_0112_DOM2_E20/bs=32-dn=amaz_wild-e=20-ee=5000-lp=1-l=xent-l=1e-05-ls=cosi_anne-mc=1024-ms=Llama-3.2-1B-nd=20000-ntd=10000-o=adam-s=0-twd=0/weak_labels"
+        student_emb_path: "/data/w2s_features/Llama-3.1-8B/amazon_wilds_target_train"
+        frac_max: null
+
+w2s:
+  train_val_test_split: [0.7, 0.1, 0.2] # ortion of the pseudo-labeled data to train on, validate on, and evaluate on, respectively
+  n_epochs: 10
+  lr: 1e-5
+  batch_size: 32
